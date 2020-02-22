@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using HtmlAgilityPack;
+using System.Net.Http;
 
 namespace WebsiteAnalysis
 {
@@ -44,36 +46,78 @@ namespace WebsiteAnalysis
                 treeView1.EndUpdate();
             treeView1.ExpandAll();
             treeView1.Show();
+            URLNode test = new URLNode("http://wsu.edu");
+            test.AddParsedAsync();
 
+        }
+        public void setText(string textbox)
+        {
+            this.textBox1.Text = textbox;
         }
     }
 
     public class URLNode : TreeNode// class to store data of website links
     {
-        public string URL;//this url
+        public string URL;//this url MUST INCLUDE HTTP//:
 
-        URLNode(string initializedURL)//create tree with URL declared
+        public URLNode(string initializedURL)//create tree with URL declared
         {
-            ///////////////
+            URL = initializedURL;
         }
 
-        void AddParsed()//get data from website about links
+        public async void AddParsedAsync()//get data from website about links
         {
+            HttpClient parsingHttp = new HttpClient();
+            parsingHttp.BaseAddress = new Uri(this.URL);
+            string domainURL = this.domainFinder();
+            string currentPage = await parsingHttp.GetStringAsync(URL);
+            ((Form1)Form1.ActiveForm).setText(currentPage);
             //////////////////
+            ///
+            //LOOP THROUGH ALL LINKS
+            //HtmlAgilityPack
         }
+
+        private string domainFinder()
+        {
+            StringBuilder domainURL = new StringBuilder();
+            int i = 0;
+            for (int colons = 0, slashs = 0; i < this.URL.Length; i++)
+            {
+                if (this.URL.ElementAt(i) == '/')
+                {
+                    slashs++;
+                }
+                else if (this.URL.ElementAt(i) == ':')
+                {
+                    colons++;
+                }
+                if (slashs == 3)
+                {
+                    break;
+                }
+            }
+            domainURL.Append(this.URL, 0, i);
+            return domainURL.ToString();
+        }
+
+        public URLTree URLTree { get { return (URLTree)this.TreeView; } }
 
     }
 
     public class URLTree : TreeView
     {
 
-        URLTree(URLNode rootNode)
+        URLTree(string rootURL)
         {
-            //////////////////////////
+            this.TopNode = new URLNode(rootURL);//////////////////////////
         }
+
+        public URLNode TopURLNode { get { return (URLNode)this.TopNode; } }
 
         private void FillMyTreeView()
         {
+            ((URLNode)this.TopNode).AddParsedAsync();
             //Filled With Example Code
 
             //// Add customers to the ArrayList of Customer objects.
