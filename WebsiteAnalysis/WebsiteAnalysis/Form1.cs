@@ -28,7 +28,7 @@ namespace WebsiteAnalysis
 
         private void button1_Click(object sender, EventArgs e)//Main Start button Click Behavior
         {
-            string testingURL = "http://" + textBox1.Text;
+            string testingURL = "http://" + domainTextBox.Text;
 
             HtmlAgilityPack.HtmlDocument temp = new HtmlAgilityPack.HtmlDocument();
             HtmlWeb temp1 = new HtmlWeb();
@@ -51,13 +51,47 @@ namespace WebsiteAnalysis
                 return;
             }
 
+            treeView1.UseWaitCursor = true;
+            treeView1.Show();
+
             treeView1.BeginUpdate();
             treeView1.setURLTreeRoot(testingURL);
             treeView1.FillMyTree();
             treeView1.EndUpdate();
+            treeView1.UseWaitCursor = false;
+            treeView1.ExpandAll();
+            treeView1.Show();
+
+
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            // Determine by checking the Text property.  
+            MessageBox.Show(e.Node.Text);
+        }
+
+        private void searchSubDomainsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void spaceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
         {
 
         }
@@ -105,16 +139,16 @@ namespace WebsiteAnalysis
             {
                 if (!((URLTree)this.TreeView).URLExistsInTree(link))//if the link dowsn't already exists in tree
                 {
-                    this.TreeView.Visible = true;
-                    this.TreeView.BringToFront();
-                    this.TreeView.CreateGraphics();
+                    //this.TreeView.Visible = true;
+                    //this.TreeView.BringToFront();
+                    //this.TreeView.CreateGraphics();
                     this.TreeView.BeginUpdate();
                     URLNode tempNode = new URLNode(link);
                     this.Nodes.Add(tempNode);
                     Console.WriteLine("inserting [" + tempNode.URL + "]");
                     this.TreeView.EndUpdate();
-                    this.TreeView.ExpandAll();
                     this.TreeView.Show();
+
                 }
 
             }
@@ -161,7 +195,7 @@ namespace WebsiteAnalysis
             }
             List<string> processingSplitter = new List<string>();
             List<string> validSplitter = new List<string>();
-            string[] delim = { };
+            string[] delim = { };////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Make Dynamic to search for subdomains
             if (((URLTree)this.TreeView).domainURL.ToLower().StartsWith("https"))
             {
                 delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Remove(4,1) };//make dynamic
@@ -174,7 +208,7 @@ namespace WebsiteAnalysis
             processingSplitter.RemoveAt(0);//remove all found before the first delim
             foreach (string line in processingSplitter)
             {
-                string[] endDelims = { "\"", "\'", "&", " ", "=", "?"};
+                string[] endDelims = { "\"", "\'", "&", " ", "=", "?"};/////////////////////////////////////////////////////////////////////////////////////Make Dynamic
                 string temp = line.Split(endDelims, StringSplitOptions.RemoveEmptyEntries)[0];//temp is everything included in the link
                 if (!temp.Contains(".") && !temp.Contains("json"))//if there is not a file extension at the end of the file or format tag
                 {
