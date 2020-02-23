@@ -243,7 +243,7 @@ namespace WebsiteAnalysis
             else
             {
                 this.Nodes.RemoveAt(0);
-                this.Nodes.Add((new URLNode(rootURL)));
+                                this.Nodes.Add((new URLNode(rootURL)));
             }
             this.TopNode = Nodes[0];
             this.domainURL = ((URLNode)this.TopNode).domainFinder();
