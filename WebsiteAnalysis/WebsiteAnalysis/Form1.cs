@@ -292,7 +292,7 @@ namespace WebsiteAnalysis
         private void clicksFromRootText_Leave(object sender, EventArgs e)//update linear nodes until highlight
         {
             int temp = 0;
-            if (int.TryParse(this.clicksLinearText.ToString(), out temp))
+            if (int.TryParse(this.clicksFromRootText.ToString(), out temp) || this.clicksFromRootText.Text == "")
             {
                 treeView1.highlightFromRootCount = temp;
             }
@@ -316,7 +316,7 @@ namespace WebsiteAnalysis
         private void setMaxNodesText_Leave(object sender, EventArgs e)//update linear nodes until highlight
         {
             int temp = 0;
-            if (int.TryParse(this.clicksLinearText.ToString(), out temp))
+            if (int.TryParse(this.setMaxNodesText.ToString(), out temp) || this.setMaxNodesText.Text == "")
             {
                 treeView1.maxNodes = temp;
             }
@@ -448,6 +448,7 @@ namespace WebsiteAnalysis
                         try
                         {
                             URLNode tempNode = this;
+                            //if (tempNode.Parent.Nodes.Count != 1) ;
                             for (int i = 0; i < ((URLTree)this.TreeView).highlightLinearCount; i++)
                             {
                                 if (tempNode == null || tempNode.Nodes.Count != 1)
@@ -472,6 +473,10 @@ namespace WebsiteAnalysis
                         this.TreeView.EndUpdate();
                         this.TreeView.Show();
                         ((URLTree)this.TreeView).currentNodes++;
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
 
@@ -653,8 +658,10 @@ namespace WebsiteAnalysis
                 this.Nodes.RemoveAt(this.Nodes.Count - 1);
                 ((URLTree)this).currentNodes--;
             }
+            ((URLTree)this).currentNodes = 0;
             URLNode temp = new URLNode(rootURL);
             this.Nodes.Add(temp);
+            ((URLTree)this).currentNodes++;
             this.TopNode = (URLNode)(Nodes[0]);
             this.domainURL = ((URLNode)(this.TopNode)).domainFinder();
         }
