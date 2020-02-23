@@ -30,7 +30,7 @@
         {
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeView1 = new WebsiteAnalysis.URLTree();
             this.SuspendLayout();
             // 
             // textBox1
@@ -52,10 +52,10 @@
             // 
             // treeView1
             // 
-            this.treeView1.Location = new System.Drawing.Point(12, 41);
+            this.treeView1.Location = new System.Drawing.Point(13, 39);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(776, 397);
-            this.treeView1.TabIndex = 3;
+            this.treeView1.Size = new System.Drawing.Size(775, 399);
+            this.treeView1.TabIndex = 2;
             // 
             // Form1
             // 
@@ -76,7 +76,7 @@
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TreeView treeView1;
+        private WebsiteAnalysis.URLTree treeView1;
     }
 }
 

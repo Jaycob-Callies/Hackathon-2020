@@ -9,7 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using HtmlAgilityPack;
-using System.Net.Http;
+using System.Net;
+using System.Runtime.ExceptionServices;
 
 namespace WebsiteAnalysis
 {
@@ -27,58 +28,109 @@ namespace WebsiteAnalysis
 
         private void button1_Click(object sender, EventArgs e)//Main Start button Click Behavior
         {
-            //System.Drawing.SolidBrush myBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Red);//Temp example code
-            //System.Drawing.Graphics formGraphics;////////////////////////////////////
-            //formGraphics = this.CreateGraphics();
-            //formGraphics.FillEllipse(myBrush, new Rectangle(0, 0, 200, 300));
-            //myBrush.Dispose();
-            //formGraphics.Dispose();
-            // Populates a TreeView control with example nodes. 
-            treeView1.Visible = true;
-            treeView1.BringToFront();
-            treeView1.CreateGraphics();
-                treeView1.BeginUpdate();
-                treeView1.Nodes.Add("Parent");
-                treeView1.Nodes[0].Nodes.Add("Child 1");
-                treeView1.Nodes[0].Nodes.Add("Child 2");
-                treeView1.Nodes[0].Nodes[1].Nodes.Add("Grandchild");
-                treeView1.Nodes[0].Nodes[1].Nodes[0].Nodes.Add("Great Grandchild");
-                treeView1.EndUpdate();
-            treeView1.ExpandAll();
-            treeView1.Show();
-            URLNode test = new URLNode("http://wsu.edu");
-            test.AddParsedAsync();
+            string testingURL = "http://" + textBox1.Text;
 
+            HtmlAgilityPack.HtmlDocument temp = new HtmlAgilityPack.HtmlDocument();
+            HtmlWeb temp1 = new HtmlWeb();
+            try
+            {
+                temp = temp1.Load(testingURL);
+            }
+            catch
+            {
+                string message = "You did not enter a valid name. Cancel this operation?";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.Yes)
+                {
+                    
+                }
+                return;
+            }
+
+            treeView1.BeginUpdate();
+            treeView1.setURLTreeRoot(testingURL);
+            treeView1.FillMyTree();
+            treeView1.EndUpdate();
         }
-        public void setText(string textbox)
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            this.textBox1.Text = textbox;
+
         }
     }
 
     public class URLNode : TreeNode// class to store data of website links
     {
         public string URL;//this url MUST INCLUDE HTTP//:
-
+        
         public URLNode(string initializedURL)//create tree with URL declared
         {
             URL = initializedURL;
+            this.Name = URL;
+            this.Text = URL;
+            this.Tag = URL;
         }
 
-        public async void AddParsedAsync()//get data from website about links
+        public void AddParsedAsync()//get data from website about links
         {
-            HttpClient parsingHttp = new HttpClient();
-            parsingHttp.BaseAddress = new Uri(this.URL);
-            string domainURL = this.domainFinder();
-            string currentPage = await parsingHttp.GetStringAsync(URL);
-            ((Form1)Form1.ActiveForm).setText(currentPage);
+            HtmlAgilityPack.HtmlDocument temp = new HtmlAgilityPack.HtmlDocument();
+            HtmlWeb temp1 = new HtmlWeb();
+            try
+            {
+                temp = temp1.Load(this.URL);
+            }
+            catch
+            {
+                return;
+            }
+            //System.Windows.Forms.HtmlDocument temp1 = new System.Windows.Forms.HtmlDocument();
+
+            string currentPage = "";
+
+            currentPage = temp.Text;
+            if (currentPage == null)
+            {
+                return;
+            }
+
+
+
+            //test.AddParsedAsync();
+            List<string> allLinksOnPage = this.parseForNewHyperLinks(currentPage.ToLower());
+            foreach(string link in allLinksOnPage)
+            {
+                if (!((URLTree)this.TreeView).URLExistsInTree(link))//if the link dowsn't already exists in tree
+                {
+                    this.TreeView.Visible = true;
+                    this.TreeView.BringToFront();
+                    this.TreeView.CreateGraphics();
+                    this.TreeView.BeginUpdate();
+                    URLNode tempNode = new URLNode(link);
+                    this.Nodes.Add(tempNode);
+                    Console.WriteLine("inserting [" + tempNode.URL + "]");
+                    this.TreeView.EndUpdate();
+                    this.TreeView.ExpandAll();
+                    this.TreeView.Show();
+                }
+
+            }
+            currentPage = "";//prevent multiple pages being held in memory
+            foreach (URLNode node in this.Nodes)
+            {
+                node.AddParsedAsync();
+            }
+            //Form1.setText(currentPage);
             //////////////////
             ///
             //LOOP THROUGH ALL LINKS
             //HtmlAgilityPack
         }
 
-        private string domainFinder()
+        public string domainFinder()
         {
             StringBuilder domainURL = new StringBuilder();
             int i = 0;
@@ -101,73 +153,114 @@ namespace WebsiteAnalysis
             return domainURL.ToString();
         }
 
-        public URLTree URLTree { get { return (URLTree)this.TreeView; } }
+        private List<string> parseForNewHyperLinks(string htmlRaw)
+        {
+            if (htmlRaw == null || htmlRaw == "")
+            {
+                return new List<string>();
+            }
+            List<string> processingSplitter = new List<string>();
+            List<string> validSplitter = new List<string>();
+            string[] delim = { };
+            if (((URLTree)this.TreeView).domainURL.ToLower().StartsWith("https"))
+            {
+                delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Remove(4,1) };//make dynamic
+            }
+            else
+            {
+                delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Insert(4, "s") };//make dynamic
+            }
+            processingSplitter = htmlRaw.Split(delim, StringSplitOptions.RemoveEmptyEntries).ToList();
+            processingSplitter.RemoveAt(0);//remove all found before the first delim
+            foreach (string line in processingSplitter)
+            {
+                string[] endDelims = { "\"", "\'", "&", " ", "=", "?"};
+                string temp = line.Split(endDelims, StringSplitOptions.RemoveEmptyEntries)[0];//temp is everything included in the link
+                if (!temp.Contains(".") && !temp.Contains("json"))//if there is not a file extension at the end of the file or format tag
+                {
+                    validSplitter.Add(((URLTree)this.TreeView).domainURL + temp);//add the domain back to the front
+                }
+            }
+
+            for (int i = 0; i < validSplitter.Count; i++)
+            {
+                while (validSplitter[i].ElementAt(validSplitter[i].Length - 1) == '\\' || validSplitter[i].ElementAt(validSplitter[i].Length - 1) == '/')// remove all terminationg slashes
+                {
+                    validSplitter[i] = validSplitter[i].Remove(validSplitter[i].Length - 1);
+                }
+                if (((URLTree)this.TreeView).URLExistsInTree(validSplitter[i]))//do not return already accepted links
+                {
+                    validSplitter.Remove(validSplitter[i]);
+                    i--;
+                }
+            }
+
+            //foreach (string line in validSplitter)
+            //{
+            //    while (line.ToCharArray().ElementAt(line.Length - 1).ToString() == "\\" || line.ToCharArray().ElementAt(line.Length - 1).ToString() == "/")// remove all terminationg slashes
+            //    {
+            //        line.Remove(line.Length - 2);
+            //    }
+            //}
+            //foreach (string line in validSplitter)
+            //{
+            //    if (((URLTree)this.TreeView).URLExistsInTree(line))//if the link already exists in tree
+            //    {
+            //        validSplitter.Remove(line);
+            //    }
+            return validSplitter;
+        }
+
+        public bool URLExistsInTreeHelper(string queryURL)
+        {
+            bool exists = false;
+            if (this.URL == queryURL)
+            {
+                return true;
+            }
+            foreach(TreeNode node in this.Nodes)
+            {
+                if(((URLNode)node).URLExistsInTreeHelper(queryURL) == true)
+                {
+                    exists = true;
+                }
+            }
+            return exists;
+        }
 
     }
 
     public class URLTree : TreeView
     {
+        public string domainURL;//only initialized if constructed with overload
 
-        URLTree(string rootURL)
+        public void setURLTreeRoot(string rootURL)
         {
-            this.TopNode = new URLNode(rootURL);//////////////////////////
+            if (this.Nodes.Count == 0)
+            {
+                this.Nodes.Add((new URLNode(rootURL)));
+            }
+            else
+            {
+                this.Nodes.RemoveAt(0);
+                this.Nodes.Add((new URLNode(rootURL)));
+            }
+            this.TopNode = Nodes[0];
+            this.domainURL = ((URLNode)this.TopNode).domainFinder();
         }
 
-        public URLNode TopURLNode { get { return (URLNode)this.TopNode; } }
-
-        private void FillMyTreeView()
+        public bool URLExistsInTree(string queryURL)
         {
-            ((URLNode)this.TopNode).AddParsedAsync();
+            return ((URLNode)this.TopNode).URLExistsInTreeHelper(queryURL);
+        }
+
+        public void FillMyTree()
+        {
+            ((URLNode)TopNode).AddParsedAsync();
             //Filled With Example Code
 
-            //// Add customers to the ArrayList of Customer objects.
-            //this.Nodes.Add(URLNode);
-            //for (int x = 0; x < 1000; x++)
-            //{
-            //    tempURLNode.Add(new Customer("Customer" + x.ToString()));
-            //}
-
-            //// Add orders to each Customer object in the ArrayList.
-            //foreach (Customer customer1 in tempURLNode)
-            //{
-            //    for (int y = 0; y < 15; y++)
-            //    {
-            //        customer1.CustomerOrders.Add(new Order("Order" + y.ToString()));
-            //    }
-            //}
-
-            //// Display a wait cursor while the TreeNodes are being created.
-            //Cursor.Current = new Cursor("MyWait.cur");
-
-            //// Suppress repainting the TreeView until all the objects have been created.
-            //treeView1.BeginUpdate();
-
-            //// Clear the TreeView each time the method is called.
-            //treeView1.Nodes.Clear();
-
-            //// Add a root TreeNode for each Customer object in the ArrayList.
-            //foreach (Customer customer2 in tempURLNode)
-            //{
-            //    treeView1.Nodes.Add(new TreeNode(customer2.CustomerName));
-
-            //    // Add a child treenode for each Order object in the current Customer object.
-            //    foreach (Order order1 in customer2.CustomerOrders)
-            //    {
-            //        treeView1.Nodes[tempURLNode.IndexOf(customer2)].Nodes.Add(
-            //          new TreeNode(customer2.CustomerName + "." + order1.OrderID));
-            //    }
-            //}
-
-            //// Reset the cursor to the default for all controls.
-            //Cursor.Current = Cursors.Default;
-
-            //// Begin repainting the TreeView.
-            //treeView1.EndUpdate();
         }
     }
-
-    // Create a new ArrayList to hold the Customer objects.
-    //private ArrayList tempURLNode = new ArrayList(); 
 
 
 
