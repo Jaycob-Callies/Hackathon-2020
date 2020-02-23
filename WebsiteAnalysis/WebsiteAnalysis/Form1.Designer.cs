@@ -34,20 +34,23 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setDeliminatorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.spaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ampersandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.equalsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.questionMarkStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.searchSubDomainsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.highlightDistantNodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.afterLinearForToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clicksLinearText = new System.Windows.Forms.ToolStripTextBox();
             this.afterXClicksFromRootToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clicksFromRootText = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.searchSubDomainsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.setMaxNodesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setMaxNodesText = new System.Windows.Forms.ToolStripTextBox();
             this.shortestPathButton = new System.Windows.Forms.Button();
             this.destinationTextBox = new System.Windows.Forms.TextBox();
             this.treeView1 = new WebsiteAnalysis.URLTree();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -89,7 +92,9 @@
             this.toolStripSeparator1,
             this.highlightDistantNodesToolStripMenuItem,
             this.toolStripSeparator2,
-            this.searchSubDomainsToolStripMenuItem});
+            this.searchSubDomainsToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.setMaxNodesToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.settingsToolStripMenuItem.Text = "Settings";
@@ -97,22 +102,22 @@
             // setDeliminatorsToolStripMenuItem
             // 
             this.setDeliminatorsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.spaceToolStripMenuItem,
+            this.ampersandToolStripMenuItem,
             this.equalsToolStripMenuItem,
             this.questionMarkStripMenuItem});
             this.setDeliminatorsToolStripMenuItem.Name = "setDeliminatorsToolStripMenuItem";
             this.setDeliminatorsToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.setDeliminatorsToolStripMenuItem.Text = "Set Deliminators";
             // 
-            // spaceToolStripMenuItem
+            // ampersandToolStripMenuItem
             // 
-            this.spaceToolStripMenuItem.Checked = true;
-            this.spaceToolStripMenuItem.CheckOnClick = true;
-            this.spaceToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.spaceToolStripMenuItem.Name = "spaceToolStripMenuItem";
-            this.spaceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.spaceToolStripMenuItem.Text = "Ampersand";
-            this.spaceToolStripMenuItem.Click += new System.EventHandler(this.spaceToolStripMenuItem_Click);
+            this.ampersandToolStripMenuItem.Checked = true;
+            this.ampersandToolStripMenuItem.CheckOnClick = true;
+            this.ampersandToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ampersandToolStripMenuItem.Name = "ampersandToolStripMenuItem";
+            this.ampersandToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ampersandToolStripMenuItem.Text = "Ampersand";
+            this.ampersandToolStripMenuItem.Click += new System.EventHandler(this.ampToolStripMenuItem_Click);
             // 
             // equalsToolStripMenuItem
             // 
@@ -122,6 +127,8 @@
             this.equalsToolStripMenuItem.Name = "equalsToolStripMenuItem";
             this.equalsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.equalsToolStripMenuItem.Text = "Equals";
+            this.equalsToolStripMenuItem.Click += new System.EventHandler(this.equalsToolStripMenuItem_Click);
+
             // 
             // questionMarkStripMenuItem
             // 
@@ -131,14 +138,13 @@
             this.questionMarkStripMenuItem.Name = "questionMarkStripMenuItem";
             this.questionMarkStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.questionMarkStripMenuItem.Text = "Question Mark";
+            this.questionMarkStripMenuItem.Click += new System.EventHandler(this.questionMarkToolStripMenuItem_Click);
+
             // 
-            // searchSubDomainsToolStripMenuItem
+            // toolStripSeparator1
             // 
-            this.searchSubDomainsToolStripMenuItem.CheckOnClick = true;
-            this.searchSubDomainsToolStripMenuItem.Name = "searchSubDomainsToolStripMenuItem";
-            this.searchSubDomainsToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
-            this.searchSubDomainsToolStripMenuItem.Text = "Search SubDomains";
-            this.searchSubDomainsToolStripMenuItem.Click += new System.EventHandler(this.searchSubDomainsToolStripMenuItem_Click);
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(198, 6);
             // 
             // highlightDistantNodesToolStripMenuItem
             // 
@@ -148,6 +154,7 @@
             this.highlightDistantNodesToolStripMenuItem.Name = "highlightDistantNodesToolStripMenuItem";
             this.highlightDistantNodesToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.highlightDistantNodesToolStripMenuItem.Text = "Highlight Distant Nodes";
+
             // 
             // afterLinearForToolStripMenuItem
             // 
@@ -157,13 +164,15 @@
             this.afterLinearForToolStripMenuItem.Name = "afterLinearForToolStripMenuItem";
             this.afterLinearForToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.afterLinearForToolStripMenuItem.Text = "After Linear for x Clicks";
+            this.afterLinearForToolStripMenuItem.Click += new System.EventHandler(this.afterLinearForToolStripMenuItem_Click);
+
             // 
             // clicksLinearText
             // 
             this.clicksLinearText.Name = "clicksLinearText";
             this.clicksLinearText.Size = new System.Drawing.Size(200, 23);
             this.clicksLinearText.Text = "3";
-            this.clicksLinearText.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
+            this.clicksLinearText.Leave += new System.EventHandler(this.linearText_Leave);
             // 
             // afterXClicksFromRootToolStripMenuItem
             // 
@@ -173,12 +182,48 @@
             this.afterXClicksFromRootToolStripMenuItem.Name = "afterXClicksFromRootToolStripMenuItem";
             this.afterXClicksFromRootToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.afterXClicksFromRootToolStripMenuItem.Text = "After x Clicks from Root";
+            this.afterXClicksFromRootToolStripMenuItem.Click += new System.EventHandler(this.afterXClicksFromRootToolStripMenuItem_Click);
             // 
             // clicksFromRootText
             // 
             this.clicksFromRootText.Name = "clicksFromRootText";
             this.clicksFromRootText.Size = new System.Drawing.Size(200, 23);
             this.clicksFromRootText.Text = "5";
+            this.clicksFromRootText.Leave += new System.EventHandler(this.clicksFromRootText_Leave);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(198, 6);
+            // 
+            // searchSubDomainsToolStripMenuItem
+            // 
+            this.searchSubDomainsToolStripMenuItem.CheckOnClick = true;
+            this.searchSubDomainsToolStripMenuItem.Name = "searchSubDomainsToolStripMenuItem";
+            this.searchSubDomainsToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.searchSubDomainsToolStripMenuItem.Text = "Search SubDomains";
+            this.searchSubDomainsToolStripMenuItem.Click += new System.EventHandler(this.searchSubDomainsToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(198, 6);
+            // 
+            // setMaxNodesToolStripMenuItem
+            // 
+            this.setMaxNodesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setMaxNodesText});
+            this.setMaxNodesToolStripMenuItem.Name = "setMaxNodesToolStripMenuItem";
+            this.setMaxNodesToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
+            this.setMaxNodesToolStripMenuItem.Text = "Set Max Nodes";
+            // 
+            // setMaxNodesText
+            // 
+            this.setMaxNodesText.Name = "setMaxNodesText";
+            this.setMaxNodesText.Size = new System.Drawing.Size(180, 23);
+            this.setMaxNodesText.Text = "1000";
+            this.setMaxNodesText.Leave += new System.EventHandler(this.setMaxNodesText_Leave);
+
             // 
             // shortestPathButton
             // 
@@ -189,6 +234,7 @@
             this.shortestPathButton.TabIndex = 5;
             this.shortestPathButton.Text = "Calculate Shortest Path ";
             this.shortestPathButton.UseVisualStyleBackColor = true;
+            this.shortestPathButton.Click += new System.EventHandler(this.shortestPathButton_Click);
             // 
             // destinationTextBox
             // 
@@ -208,16 +254,6 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(776, 385);
             this.treeView1.TabIndex = 2;
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(198, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(198, 6);
             // 
             // Form1
             // 
@@ -251,7 +287,7 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setDeliminatorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem searchSubDomainsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem spaceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ampersandToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem equalsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem questionMarkStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem highlightDistantNodesToolStripMenuItem;
@@ -263,6 +299,9 @@
         private System.Windows.Forms.TextBox destinationTextBox;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem setMaxNodesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox setMaxNodesText;
     }
 }
 

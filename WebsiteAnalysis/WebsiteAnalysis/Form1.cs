@@ -19,7 +19,7 @@ namespace WebsiteAnalysis
         public Form1()
         {
             InitializeComponent();
-        }
+        } 
 
         private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
@@ -38,15 +38,15 @@ namespace WebsiteAnalysis
             }
             catch
             {
-                string message = "You did not enter a valid name. Cancel this operation?";
+                string message = "You did not enter a valid url. (do not include http)";
                 string caption = "Error Detected in Input";
-                MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
                 DialogResult result;
 
                 result = MessageBox.Show(message, caption, buttons);
-                if (result == System.Windows.Forms.DialogResult.Yes)
+                if (result == System.Windows.Forms.DialogResult.OK)
                 {
-                    
+
                 }
                 return;
             }
@@ -65,28 +65,122 @@ namespace WebsiteAnalysis
 
         }
 
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)//Not Working
         {
-            // Determine by checking the Text property.  
             MessageBox.Show(e.Node.Text);
+            System.Diagnostics.Process.Start(((URLNode)e.Node).URL);
         }
 
-        private void searchSubDomainsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void shortestPathButton_Click(object sender, EventArgs e)//update subdomain check
         {
-
+            //SHORTEST PATH FUNCTION
+            //this.treeView1.searchSubDomains = this.searchSubDomainsToolStripMenuItem.Checked;
         }
 
-        private void spaceToolStripMenuItem_Click(object sender, EventArgs e)
+        private void searchSubDomainsToolStripMenuItem_Click(object sender, EventArgs e)//update subdomain check
         {
-
+            this.treeView1.searchSubDomains = this.searchSubDomainsToolStripMenuItem.Checked;
         }
 
-        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        private void ampToolStripMenuItem_Click(object sender, EventArgs e)//update deliminate on ampersand
         {
+            this.treeView1.ampersandDeliminated = this.ampersandToolStripMenuItem.Checked;
+        }
+
+        private void linearText_Leave(object sender, EventArgs e)//update linear nodes until highlight
+        {
+            int temp = 0;
+            if (int.TryParse(this.clicksLinearText.ToString(), out temp))
+            {
+                treeView1.highlightLinearCount = temp;
+            }
+            else
+            {
+                string message = "You did not enter a valid int.";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+            }
 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void clicksFromRootText_Leave(object sender, EventArgs e)//update linear nodes until highlight
+        {
+            int temp = 0;
+            if (int.TryParse(this.clicksLinearText.ToString(), out temp))
+            {
+                treeView1.highlightFromRootCount = temp;
+            }
+            else
+            {
+                string message = "You did not enter a valid int.";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+            }
+
+        }
+
+        private void setMaxNodesText_Leave(object sender, EventArgs e)//update linear nodes until highlight
+        {
+            int temp = 0;
+            if (int.TryParse(this.clicksLinearText.ToString(), out temp))
+            {
+                treeView1.maxNodes = temp;
+            }
+            else
+            {
+                string message = "You did not enter a valid int.";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+            }
+
+        }
+
+        private void equalsToolStripMenuItem_Click(object sender, EventArgs e)//update Eauqls
+        {
+            this.treeView1.equalsDeliminated = this.equalsToolStripMenuItem.Checked;
+        }
+
+        private void questionMarkToolStripMenuItem_Click(object sender, EventArgs e)//update Question
+        {
+            this.treeView1.questionDeliminated = this.questionMarkStripMenuItem.Checked;
+        }
+
+        private void afterLinearForToolStripMenuItem_Click(object sender, EventArgs e)//update if linear items are highlighted
+        {
+            this.treeView1.highlightLinear = this.afterLinearForToolStripMenuItem.Checked;
+        }
+
+        private void afterXClicksFromRootToolStripMenuItem_Click(object sender, EventArgs e)//update if linear items are highlighted
+        {
+            this.treeView1.highlightFromRoot = this.afterXClicksFromRootToolStripMenuItem.Checked;
+        }
+
+
+        private void textBox1_TextChanged(object sender, EventArgs e)//domain txt change
         {
 
         }
@@ -267,7 +361,8 @@ namespace WebsiteAnalysis
     public class URLTree : TreeView
     {
         public string domainURL;//only initialized if constructed with overload
-
+        public bool ampersandDeliminated = true, equalsDeliminated = true, questionDeliminated = true, highlightLinear = false, highlightFromRoot = false, searchSubDomains = false;
+        public int highlightLinearCount = 3, highlightFromRootCount = 5, maxNodes = 1000, currentNodes = 0;
         public void setURLTreeRoot(string rootURL)
         {
             if (this.Nodes.Count == 0)
@@ -283,20 +378,14 @@ namespace WebsiteAnalysis
             this.domainURL = ((URLNode)this.TopNode).domainFinder();
         }
 
-        public bool URLExistsInTree(string queryURL)
+        public bool URLExistsInTree(string queryURL)//return if the URL is found in the tree
         {
             return ((URLNode)this.TopNode).URLExistsInTreeHelper(queryURL);
         }
 
         public void FillMyTree()
         {
-            ((URLNode)TopNode).AddParsedAsync();
-            //Filled With Example Code
-
+            ((URLNode)TopNode).AddParsedAsync();//recursively add nodes
         }
     }
-
-
-
-
 }
