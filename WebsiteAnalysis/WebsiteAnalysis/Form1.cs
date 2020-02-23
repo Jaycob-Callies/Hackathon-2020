@@ -19,7 +19,7 @@ namespace WebsiteAnalysis
         public Form1()
         {
             InitializeComponent();
-        } 
+        }
 
         private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
         {
@@ -38,7 +38,7 @@ namespace WebsiteAnalysis
             }
             catch
             {
-                string message = "You did not enter a valid url. (do not include http)";
+                string message = "You did not enter a valid url. (do not include http://)";
                 string caption = "Error Detected in Input";
                 MessageBoxButtons buttons = MessageBoxButtons.OK;
                 DialogResult result;
@@ -61,22 +61,200 @@ namespace WebsiteAnalysis
             treeView1.UseWaitCursor = false;
             treeView1.ExpandAll();
             treeView1.Show();
-
-
         }
 
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)//Not Working
+        private void treeView1_AfterSelect(object sender, MouseEventArgs e)//clickable links
         {
-            MessageBox.Show(e.Node.Text);
-            System.Diagnostics.Process.Start(((URLNode)e.Node).URL);
+            foreach (TreeNode node in this.treeView1.Nodes)
+            {
+                if (containsHelper(node, e.Location) != null)
+                {
+                    HtmlWeb tempWeb = new HtmlWeb();
+                    HtmlAgilityPack.HtmlDocument tempDoc = new HtmlAgilityPack.HtmlDocument();
+                    try
+                    {
+                        tempDoc = tempWeb.Load(((URLNode)node).URL);
+                    }
+                    catch
+                    {
+                        return;
+                    }
+                    System.Diagnostics.Process.Start(((URLNode)containsHelper(node, e.Location)).URL);
+                    break;
+                }
+            }
+        }
+
+        TreeNode containsHelper(TreeNode node, Point click)
+        {
+            TreeNode temp = null;
+            if (node.Bounds.Contains(click))
+            {
+                return node;
+            }
+            else
+            {
+                foreach (TreeNode singleNode in node.Nodes)
+                {
+                    if (containsHelper(singleNode, click) != null)
+                    {
+                        return containsHelper(singleNode, click);
+                    }
+                }
+            }
+            return temp;
         }
 
         private void shortestPathButton_Click(object sender, EventArgs e)//update subdomain check
         {
-            //SHORTEST PATH FUNCTION
-            //this.treeView1.searchSubDomains = this.searchSubDomainsToolStripMenuItem.Checked;
+            string sourceURL = "http://" + domainTextBox.Text, destinationURL = "http://" + destinationTextBox.Text;
+            HtmlAgilityPack.HtmlDocument temp = new HtmlAgilityPack.HtmlDocument();
+            HtmlWeb temp1 = new HtmlWeb();
+            try
+            {
+                temp = temp1.Load(destinationURL);
+            }
+            catch
+            {
+                string message = "You did not enter a valid destination url. (do not include http://)";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+            }
+            try
+            {
+                temp = temp1.Load(sourceURL);
+            }
+            catch
+            {
+                string message = "You did not enter a valid source url. (do not include http://)";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+            }
+            if (this.treeView1.searchSubDomains && !domainTextBox.Text.Contains(destinationTextBox.Text) && !domainTextBox.Text.Contains(destinationTextBox.Text))
+            {
+
+                string message = "Your Inputs are not in the same domain.";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+
+            }
+            if (!this.treeView1.searchSubDomains && domainTextBox.Text.Split(new string[] { "/" }, StringSplitOptions.None)[0] != destinationTextBox.Text.Split(new string[] { "/" }, StringSplitOptions.None)[0])
+
+            {
+
+                string message = "Your Inputs are not in the same subdomain. (try enabling multiple subdomains)";
+                string caption = "Error Detected in Input";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result;
+
+                result = MessageBox.Show(message, caption, buttons);
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+
+                }
+                return;
+
+            }
+
+            treeView1.UseWaitCursor = true;
+            treeView1.Show();
+
+            treeView1.BeginUpdate();
+            treeView1.setURLTreeRoot(sourceURL);
+            treeView1.FillMyTree();
+            removeNonContainingPathHelper(destinationURL, (URLNode)(this.treeView1.TopNode));
+            if (treeView1.Nodes.Count == 0 || treeView1.Nodes[0].Nodes.Count == 0)
+            {
+                treeView1.Nodes.Add("No Valid Path");
+            }
+            treeView1.EndUpdate();
+            treeView1.UseWaitCursor = false;
+            treeView1.ExpandAll();
+            treeView1.Show();
         }
 
+        bool removeNonContainingPath(string nodeURL, URLNode node)
+        {
+            List<bool> markForDelete = new List<bool>();
+            bool parentDelete = true;
+            if (node.URL == nodeURL)
+            {
+                return false;
+            }
+            else
+            {
+                foreach (TreeNode singleNode in node.Nodes)
+                {
+                    if (removeNonContainingPath(nodeURL, (URLNode)singleNode) == false)
+                    {
+                        parentDelete = false;
+                        markForDelete.Add( false);
+                    }
+                    else
+                    {
+                        markForDelete.Add(true);
+                    }
+                }
+            }
+            for (int i = markForDelete.Count - 1; i > -1; i--)
+            {
+                if (markForDelete.ElementAt(i))
+                {
+                    node.Nodes.RemoveAt(i);
+                    ((URLTree)treeView1).currentNodes--;
+                }
+            }
+            return parentDelete;
+        }
+
+        void removeNonContainingPathHelper(string nodeURL, URLNode node)
+        {
+            List<bool> markForDelete = new List<bool>();
+            foreach (TreeNode singleNode in node.Nodes)
+            {
+                if (removeNonContainingPath(nodeURL, (URLNode)singleNode))
+                {
+                    markForDelete.Add(true);
+                }
+                else
+                {
+                    markForDelete.Add(false);
+                }
+            }
+            for(int i = markForDelete.Count - 1; i > -1; i--)
+            {
+                if (markForDelete.ElementAt(i))
+                {
+                    node.Nodes.RemoveAt(i);
+                    ((URLTree)treeView1).currentNodes--;
+                }
+            }
+        }
+        
         private void searchSubDomainsToolStripMenuItem_Click(object sender, EventArgs e)//update subdomain check
         {
             this.treeView1.searchSubDomains = this.searchSubDomainsToolStripMenuItem.Checked;
@@ -90,7 +268,7 @@ namespace WebsiteAnalysis
         private void linearText_Leave(object sender, EventArgs e)//update linear nodes until highlight
         {
             int temp = 0;
-            if (int.TryParse(this.clicksLinearText.ToString(), out temp))
+            if (int.TryParse(this.clicksLinearText.ToString(), out temp) || this.clicksLinearText.Text == "")
             {
                 treeView1.highlightLinearCount = temp;
             }
@@ -236,13 +414,65 @@ namespace WebsiteAnalysis
                     //this.TreeView.Visible = true;
                     //this.TreeView.BringToFront();
                     //this.TreeView.CreateGraphics();
-                    this.TreeView.BeginUpdate();
-                    URLNode tempNode = new URLNode(link);
-                    this.Nodes.Add(tempNode);
-                    Console.WriteLine("inserting [" + tempNode.URL + "]");
-                    this.TreeView.EndUpdate();
-                    this.TreeView.Show();
+                    if (((URLTree)this.TreeView).currentNodes < ((URLTree)this.TreeView).maxNodes)
+                    {
+                        this.TreeView.BeginUpdate();
+                        //URLNode tempNode = new URLNode(link);
+                        this.Nodes.Add(new URLNode(link));
 
+                        bool highlightfromroot = ((URLTree)this.TreeView).highlightFromRoot;
+                        try
+                        {
+                            URLNode tempNode = this;
+                            for (int i = 0; i < ((URLTree)this.TreeView).highlightFromRootCount; i++)
+                            {
+                                if (tempNode == null)
+                                {
+                                    highlightfromroot = false;
+                                    break;
+                                }
+                                tempNode = (URLNode)tempNode.Parent;
+                            }
+                        }
+                        catch
+                        {
+                            highlightfromroot = false;
+                        }
+
+                        if (highlightfromroot)
+                        {
+                            this.Nodes[this.Nodes.Count - 1].BackColor = Color.DarkRed;
+                        }
+
+                        bool highlight = ((URLTree)this.TreeView).highlightLinear;
+                        try
+                        {
+                            URLNode tempNode = this;
+                            for (int i = 0; i < ((URLTree)this.TreeView).highlightLinearCount; i++)
+                            {
+                                if (tempNode == null || tempNode.Nodes.Count != 1)
+                                {
+                                    highlight = false;
+                                    break;
+                                }
+                                tempNode = (URLNode)tempNode.Parent;
+                            }
+                        }
+                        catch
+                        {
+                            highlight = false;
+                        }
+
+                        if (highlight)
+                        {
+                            this.Nodes[this.Nodes.Count - 1].BackColor = Color.Crimson;
+                        }
+
+                        Console.WriteLine("inserting [" + ((URLNode)this.LastNode).URL + "]");
+                        this.TreeView.EndUpdate();
+                        this.TreeView.Show();
+                        ((URLTree)this.TreeView).currentNodes++;
+                    }
                 }
 
             }
@@ -289,26 +519,79 @@ namespace WebsiteAnalysis
             }
             List<string> processingSplitter = new List<string>();
             List<string> validSplitter = new List<string>();
-            string[] delim = { };////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Make Dynamic to search for subdomains
-            if (((URLTree)this.TreeView).domainURL.ToLower().StartsWith("https"))
-            {
-                delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Remove(4,1) };//make dynamic
-            }
-            else
-            {
-                delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Insert(4, "s") };//make dynamic
-            }
+            string[] delim = { "hhtp://", "https://"};////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Make Dynamic to search for subdomains
+            //if (((URLTree)this.TreeView).domainURL.ToLower().StartsWith("https"))
+            //{
+            //    delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Remove(4,1) };//make dynamic
+            //}
+            //else
+            //{
+            //    delim = new string[] { ((URLTree)this.TreeView).domainURL.ToLower(), ((URLTree)this.TreeView).domainURL.ToLower().Insert(4, "s") };//make dynamic
+            //}
             processingSplitter = htmlRaw.Split(delim, StringSplitOptions.RemoveEmptyEntries).ToList();
             processingSplitter.RemoveAt(0);//remove all found before the first delim
+
+            List<string> endDelims = new List<string>();
+            endDelims.Add("\"");
+            endDelims.Add("\'");
+            endDelims.Add(" ");
+            if (((URLTree)(this.TreeView)).ampersandDeliminated)
+            {
+                endDelims.Add("&");
+            }
+            if (((URLTree)(this.TreeView)).equalsDeliminated)
+            {
+                endDelims.Add("=");
+            }
+            if (((URLTree)(this.TreeView)).questionDeliminated)
+            {
+                endDelims.Add("?");
+            }
+
+
+            bool rootisSub = false;
+            string mainDomain = ((URLTree)this.TreeView).domainURL.ToLower().Split(new String[] { "http://" }, StringSplitOptions.RemoveEmptyEntries).Last();
+
+            if ((((URLTree)this.TreeView).domainURL.ToLower().Split('.').Count()) >= 3 && ((URLTree)(this.TreeView)).searchSubDomains)
+            {
+                rootisSub = true;
+                mainDomain = (((URLTree)this.TreeView).domainURL.ToLower().Split('.'))[((URLTree)this.TreeView).domainURL.ToLower().Split('.').Count() - 2] + "." + (((URLTree)this.TreeView).domainURL.ToLower().Split('.'))[((URLTree)this.TreeView).domainURL.ToLower().Split('.').Count() - 1];
+            }
+
             foreach (string line in processingSplitter)
             {
-                string[] endDelims = { "\"", "\'", "&", " ", "=", "?"};/////////////////////////////////////////////////////////////////////////////////////Make Dynamic
-                string temp = line.Split(endDelims, StringSplitOptions.RemoveEmptyEntries)[0];//temp is everything included in the link
-                if (!temp.Contains(".") && !temp.Contains("json"))//if there is not a file extension at the end of the file or format tag
+                string temp = line.Split(endDelims.ToArray(), StringSplitOptions.RemoveEmptyEntries)[0];//temp is everything included in the link until delim
+                temp = temp.TrimEnd(new char[] { '/', '\\' });//trim end
+                if (((((URLTree)(this.TreeView)).searchSubDomains == false && temp.StartsWith(mainDomain)) || ((URLTree)(this.TreeView)).searchSubDomains == true && temp.Contains(mainDomain)) && !temp.Split(new string[] { mainDomain }, StringSplitOptions.None).Last().Contains(".") && !temp.Contains("json"))
                 {
-                    validSplitter.Add(((URLTree)this.TreeView).domainURL + temp);//add the domain back to the front
+                    validSplitter.Add("http://" + temp);//add format back to the front
                 }
             }
+
+
+            //foreach (string line in processingSplitter)
+            //{
+            //    string temp = line.Split(endDelims.ToArray(), StringSplitOptions.RemoveEmptyEntries)[0];//temp is everything included in the link until delim
+            //    bool rootisSub = false;
+            //    string mainDomain = ((URLTree)this.TreeView).domainURL.ToLower();
+
+            //    if (((URLTree)(this.TreeView)).searchSubDomains)
+            //    {
+            //        if ((((URLTree)this.TreeView).domainURL.ToLower().Split('.').Count()) >= 3){
+            //            rootisSub = true;
+            //            mainDomain = (((URLTree)this.TreeView).domainURL.ToLower().Split('.'))[((URLTree)this.TreeView).domainURL.ToLower().Split('.').Count() - 2] +"."+ (((URLTree)this.TreeView).domainURL.ToLower().Split('.'))[((URLTree)this.TreeView).domainURL.ToLower().Split('.').Count()-1];
+            //        }
+            //        if ((temp.Split(new string[] { "http://", "https://" }, StringSplitOptions.RemoveEmptyEntries)[0].Contains(delim[0]) || temp.Split(new string[] { "http://", "https://" }, StringSplitOptions.RemoveEmptyEntries)[0].Contains(delim[1])))
+            //        {
+
+            //        }
+            //    }
+
+            //    if (!temp.Contains(".") && !temp.Contains("json"))//if there is not a file extension at the end of the file or format tag
+            //    {
+            //        validSplitter.Add(((URLTree)this.TreeView).domainURL + temp);//add the domain back to the front
+            //    }
+            //}
 
             for (int i = 0; i < validSplitter.Count; i++)
             {
@@ -365,17 +648,15 @@ namespace WebsiteAnalysis
         public int highlightLinearCount = 3, highlightFromRootCount = 5, maxNodes = 1000, currentNodes = 0;
         public void setURLTreeRoot(string rootURL)
         {
-            if (this.Nodes.Count == 0)
+            while (this.Nodes.Count != 0)
             {
-                this.Nodes.Add((new URLNode(rootURL)));
+                this.Nodes.RemoveAt(this.Nodes.Count - 1);
+                ((URLTree)this).currentNodes--;
             }
-            else
-            {
-                this.Nodes.RemoveAt(0);
-                                this.Nodes.Add((new URLNode(rootURL)));
-            }
-            this.TopNode = Nodes[0];
-            this.domainURL = ((URLNode)this.TopNode).domainFinder();
+            URLNode temp = new URLNode(rootURL);
+            this.Nodes.Add(temp);
+            this.TopNode = (URLNode)(Nodes[0]);
+            this.domainURL = ((URLNode)(this.TopNode)).domainFinder();
         }
 
         public bool URLExistsInTree(string queryURL)//return if the URL is found in the tree

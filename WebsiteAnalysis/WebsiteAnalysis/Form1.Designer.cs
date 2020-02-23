@@ -128,7 +128,6 @@
             this.equalsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.equalsToolStripMenuItem.Text = "Equals";
             this.equalsToolStripMenuItem.Click += new System.EventHandler(this.equalsToolStripMenuItem_Click);
-
             // 
             // questionMarkStripMenuItem
             // 
@@ -139,7 +138,6 @@
             this.questionMarkStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.questionMarkStripMenuItem.Text = "Question Mark";
             this.questionMarkStripMenuItem.Click += new System.EventHandler(this.questionMarkToolStripMenuItem_Click);
-
             // 
             // toolStripSeparator1
             // 
@@ -154,7 +152,6 @@
             this.highlightDistantNodesToolStripMenuItem.Name = "highlightDistantNodesToolStripMenuItem";
             this.highlightDistantNodesToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
             this.highlightDistantNodesToolStripMenuItem.Text = "Highlight Distant Nodes";
-
             // 
             // afterLinearForToolStripMenuItem
             // 
@@ -165,14 +162,14 @@
             this.afterLinearForToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.afterLinearForToolStripMenuItem.Text = "After Linear for x Clicks";
             this.afterLinearForToolStripMenuItem.Click += new System.EventHandler(this.afterLinearForToolStripMenuItem_Click);
-
             // 
             // clicksLinearText
             // 
+            this.clicksLinearText.AcceptsReturn = true;
             this.clicksLinearText.Name = "clicksLinearText";
             this.clicksLinearText.Size = new System.Drawing.Size(200, 23);
             this.clicksLinearText.Text = "3";
-            this.clicksLinearText.Leave += new System.EventHandler(this.linearText_Leave);
+            this.clicksLinearText.TextChanged += new System.EventHandler(this.linearText_Leave);
             // 
             // afterXClicksFromRootToolStripMenuItem
             // 
@@ -186,10 +183,11 @@
             // 
             // clicksFromRootText
             // 
+            this.clicksFromRootText.AcceptsReturn = true;
             this.clicksFromRootText.Name = "clicksFromRootText";
             this.clicksFromRootText.Size = new System.Drawing.Size(200, 23);
             this.clicksFromRootText.Text = "5";
-            this.clicksFromRootText.Leave += new System.EventHandler(this.clicksFromRootText_Leave);
+            this.clicksFromRootText.TextChanged += new System.EventHandler(this.clicksFromRootText_Leave);
             // 
             // toolStripSeparator2
             // 
@@ -219,11 +217,11 @@
             // 
             // setMaxNodesText
             // 
+            this.setMaxNodesText.AcceptsReturn = true;
             this.setMaxNodesText.Name = "setMaxNodesText";
             this.setMaxNodesText.Size = new System.Drawing.Size(180, 23);
             this.setMaxNodesText.Text = "1000";
-            this.setMaxNodesText.Leave += new System.EventHandler(this.setMaxNodesText_Leave);
-
+            this.setMaxNodesText.TextChanged += new System.EventHandler(this.setMaxNodesText_Leave);
             // 
             // shortestPathButton
             // 
@@ -254,6 +252,7 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(776, 385);
             this.treeView1.TabIndex = 2;
+            this.treeView1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeView1_AfterSelect);
             // 
             // Form1
             // 
