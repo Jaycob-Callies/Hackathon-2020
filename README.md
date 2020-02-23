@@ -1,5 +1,4 @@
 # Hackathon-2020
-Team Names: Jaycob Callies, Coleman Trader
-Tier 2,
+(Tier 2) Team Names: Jaycob Callies, Coleman Trader
 2020 Crimson Code Hackathon
 
